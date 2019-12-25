@@ -1,0 +1,16 @@
+2019-12-19 06:32:06 django.server 124 INFO "GET /dashboard/list/?page=4 HTTP/1.1" 200 560
+2019-12-20 02:29:16 django.server 124 WARNING "GET / HTTP/1.1" 404 2028
+2019-12-20 02:29:20 django.server 124 INFO "GET /dashboard/list/?page=3 HTTP/1.1" 200 1492
+2019-12-20 02:29:23 django.server 124 WARNING "GET /favicon.ico HTTP/1.1" 404 2079
+2019-12-20 02:29:25 django.server 124 INFO "GET /dashboard/list/?page=2 HTTP/1.1" 200 1491
+2019-12-20 02:29:27 django.server 124 INFO "GET /dashboard/list/?page=3 HTTP/1.1" 200 1492
+2019-12-20 02:29:28 django.server 124 INFO "GET /dashboard/list/?page=4 HTTP/1.1" 200 1492
+2019-12-20 06:52:55 django.server 124 INFO "GET /dashboard/list/ HTTP/1.1" 200 725
+2019-12-20 06:53:18 django.server 124 INFO "GET /dashboard/list/?per_page=3 HTTP/1.1" 200 220
+2019-12-20 06:54:25 django.server 124 INFO "GET /dashboard/list/?per_page=3&page=3 HTTP/1.1" 200 216
+2019-12-20 06:58:26 django.server 124 INFO "GET /dashboard/list/?per_page=3&page=3 HTTP/1.1" 200 216
+2019-12-20 07:26:59 django.server 124 ERROR "GET /dashboard/list/ HTTP/1.1" 500 91043
+2019-12-20 07:27:11 django.server 124 ERROR "GET /dashboard/list/ HTTP/1.1" 500 91043
+2019-12-20 07:28:44 django.server 124 ERROR "GET /dashboard/list/ HTTP/1.1" 500 91053
+2019-12-23 10:47:02 django.server 124 WARNING "GET / HTTP/1.1" 404 2023
+2019-12-23 10:47:03 django.server 124 WARNING "GET /favicon.ico HTTP/1.1" 404 2074
