@@ -3,7 +3,7 @@ from django.http import HttpResponse, Http404
 from django.shortcuts import render
 
 # Create your views here.
-from rest_framework import status
+from rest_framework import status,viewsets
 from rest_framework.decorators import api_view
 from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
@@ -143,9 +143,7 @@ class IdcDetail(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 ############################Idc版本三(混合)#############################
-class IdcListV2(generics.GenericAPIView,
-                mixins.ListModelMixin,
-                mixins.CreateModelMixin):
+class IdcListV2(generics.GenericAPIView,mixins.ListModelMixin,mixins.CreateModelMixin):
     queryset = Idc.objects.all()
     serializer_class = IdcSerializer
     def get(self,request,*args,**kwargs):
@@ -153,11 +151,8 @@ class IdcListV2(generics.GenericAPIView,
     def post(self,request,*args,**kwargs):
         return self.create(request, *args, **kwargs)
 
-class IdcDetailV2(generics.GenericAPIView,
-                mixins.RetrieveModelMixin,
-                mixins.UpdateModelMixin,
-                  mixins.DestroyModelMixin):
-    
+class IdcDetailV2(generics.GenericAPIView,mixins.RetrieveModelMixin,mixins.UpdateModelMixin,mixins.DestroyModelMixin):
+
     queryset = Idc.objects.all()
     serializer_class = IdcSerializer
 
@@ -167,8 +162,20 @@ class IdcDetailV2(generics.GenericAPIView,
         return self.update(request, *args, **kwargs)
     def delete(self,request,*args,**kwargs):
         return self.destroy(request, *args, **kwargs)
-
-#####################用户序列化#####################
+############################Idc版本四(混合)#############################
+class IdcListV3(generics.ListCreateAPIView):
+    queryset = Idc.objects.all()
+    serializer_class = IdcSerializer
+class IdcDetailV3(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Idc.objects.all()
+    serializer_class = IdcSerializer
+############################Idc版本四(ViewSet)#############################
+class IdcListDetailViewSet(viewsets.GenericViewSet,mixins.CreateModelMixin,
+                           mixins.ListModelMixin,mixins.RetrieveModelMixin,
+                           mixins.DestroyModelMixin,mixins.UpdateModelMixin):
+    queryset = Idc.objects.all()
+    serializer_class = IdcSerializer
+#####################用户序列化#########################################
 @api_view(['GET', 'POST'])
 def user_list(request, *args, **kwargs):
     if request.method == 'GET':
@@ -200,3 +207,39 @@ def user_detail(request, pk, *args, **kwargs):
     elif request.method == 'DELETE':
         user.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+#####################用户序列化版本二###################################
+class UserList(generics.GenericAPIView,mixins.ListModelMixin,mixins.CreateModelMixin):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    def get(self,request,*args,**kwargs):
+        return self.list(request,*args,**kwargs)
+    def post(self,request,*args,**kwargs):
+        return self.post(request,*args,**kwargs)
+
+class UserDetail(generics.GenericAPIView,mixins.RetrieveModelMixin,mixins.UpdateModelMixin,mixins.DestroyModelMixin):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+    def get(self,request,*args,**kwargs):
+        return self.retrieve(request, *args, **kwargs)
+    def put(self,request,*args,**kwargs):
+        return self.update(request, *args, **kwargs)
+    def delete(self,request,*args,**kwargs):
+        return self.destroy(request, *args, **kwargs)
+
+#####################用户序列化版本三####################################
+class UserListV2(generics.ListCreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+class UserDetailV2(generics.RetrieveUpdateDestroyAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+#####################用户序列化版本三(ViewSet)####################################
+# class UserListDetailSet(viewsets.GenericViewSet,mixins.CreateModelMixin,
+    # #                            mixins.ListModelMixin,mixins.RetrieveModelMixin,
+    # #                            mixins.DestroyModelMixin,mixins.UpdateModelMixin):
+class UserListDetailSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
