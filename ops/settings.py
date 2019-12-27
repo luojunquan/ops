@@ -42,8 +42,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'idcs.apps.IdcsConfig',
     'rest_framework',
+    'cabinet.apps.CabinetConfig',
+    'users.apps.UsersConfig',
+    'manufacturer.apps.ManufacturerConfig',
 ]
-
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema'
+}
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
