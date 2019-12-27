@@ -71,6 +71,7 @@ urlpatterns = [
 ]
 urlpatterns = format_suffix_patterns(urlpatterns)
 ############################版本六（router）#############################
+
 route = DefaultRouter()
 route.register('idcs',views.IdcListDetailViewSet)
 route.register('users',views.UserListDetailSet)
