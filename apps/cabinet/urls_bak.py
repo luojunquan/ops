@@ -14,6 +14,5 @@ from cabinet.views import CabinetServer
 route = DefaultRouter()
 route.register('cabinetserver',views.CabinetServer)
 urlpatterns = [
-    url(r'^',include(route.urls)),
-    url(r'cabinetserver/$',CabinetServer.as_view,name='cabinetserver')
+    url(r'^',include(route.urls))
 ]

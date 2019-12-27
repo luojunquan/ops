@@ -24,3 +24,14 @@ class CabinetViewset(viewsets.ModelViewSet):
     '''
     queryset = Cabinet.objects.all()
     serializer_class = CabinetSerializer
+'''
+@api_view(['GET'])
+def api_root(request, format=None, *args, **kwargs):
+    return Response({
+        'cabinetserver': reverse('cabinetserver',request=request,format=format),
+    })
+
+class CabinetServer(viewsets.ModelViewSet):
+    queryset = Cabinet.objects.all()
+    serializer_class = CabinetServerSerializer
+'''
