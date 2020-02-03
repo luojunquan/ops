@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/2.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.0/ref/settings/
 """
-
+import datetime
 import logging
 import django.utils.log
 import logging.handlers
@@ -29,7 +29,8 @@ SECRET_KEY = 'z$2id@v+=p)(%2@vk(*c^mvyzvpy!kvv#ct3gik=9=l$*x)!d4'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
+
 
 # Application definition
 
@@ -40,25 +41,64 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
+    'rest_framework.authtoken',
+    'django_filters',
     'idcs.apps.IdcsConfig',
     'rest_framework',
+    'groups.apps.GroupsConfig',
     'cabinet.apps.CabinetConfig',
     'users.apps.UsersConfig',
+    'products.apps.ProductConfig',
     'manufacturer.apps.ManufacturerConfig',
+    'servers.apps.ServersConfig',
+    'books.apps.BooksConfig',
 ]
-REST_FRAMEWORK = {
-    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema'
-}
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
-    # 'django.middleware.csrf.CsrfViewMiddleware',
+    #'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
+    "PAGE_SIZE": 8,
+    # 这是rest_formework自带的
+    # "DEFAULT_PAGINATION_CLASS":"rest_framework.pagination.PageNumberPagination",
+    # 这是我们自己设置的，需要需要在特点app中使用分页，则需要设置pagination_class=None
+    "DEFAULT_PAGINATION_CLASS": "users.pagination.Pagination",
+     "DEFAULT_FILTER_BACKENDS": (
+        'django_filters.rest_framework.DjangoFilterBackend',
+    ),
+    "DEFAULT_PERMISSION_CLASSES":(
+        "rest_framework.permissions.AllowAny",
+         # "ops.permissions.Permissions",
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+            'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+            'rest_framework.authentication.BasicAuthentication',
+            'rest_framework.authentication.SessionAuthentication',
+        )
+}
+# JWT token配置
+JWT_AUTH = {
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=300),
+    'JWT_AUTH_HEADER_PREFIX': 'JWT',
+}
+# 跨域配置
+CORS_ORIGIN_WHITELIST = (
+    'http://0.0.0.0:8000',
+)
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_METHODS = ('*')
+CORS_ALLOW_HEADERS = ('*')
 
+# CORS_ORIGIN_WHITELIST = ('*')
 ROOT_URLCONF = 'ops.urls'
 
 TEMPLATES = [
@@ -130,7 +170,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
-
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
