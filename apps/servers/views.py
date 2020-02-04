@@ -1,14 +1,11 @@
 from django.shortcuts import render
 
 # Create your views here.
-from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, mixins, permissions, response
 
 from servers.filter import ServerFilter, NetworkDeviceFilter, IpFilter
 from servers.models import Server, NetworkDevice, IP
 from servers.serializers import NetworkDeviceSerializer, IPSerializer, ServerAutoReportSerializer, ServerSerializer
-
-
 
 class ServerAutoReportViewSet(viewsets.GenericViewSet,mixins.CreateModelMixin):
     '''

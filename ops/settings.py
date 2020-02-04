@@ -86,7 +86,7 @@ REST_FRAMEWORK = {
 }
 # JWT token配置
 JWT_AUTH = {
-    'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=300),
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=1500),
     'JWT_AUTH_HEADER_PREFIX': 'JWT',
 }
 # 跨域配置

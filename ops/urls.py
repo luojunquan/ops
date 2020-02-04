@@ -27,6 +27,7 @@ from books.router import book_router
 from idcs.router import idcs_router
 from manufacturer.router import manufacturer_router
 from users.router import users_router
+from servers.router import servers_router
 
 route = DefaultRouter()
 route.registry.extend(group_router.registry)
@@ -35,6 +36,7 @@ route.registry.extend(manufacturer_router.registry)
 route.registry.extend(cabinet_router.registry)
 route.registry.extend(permission_router.registry)
 route.registry.extend(products_router.registry)
+route.registry.extend(servers_router.registry)
 route.registry.extend(users_router.registry)
 route.registry.extend(book_router.registry)
 
