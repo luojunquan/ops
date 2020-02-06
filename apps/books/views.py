@@ -47,7 +47,7 @@ class AuthorViewSet(viewsets.ModelViewSet):
     """
 
     authentication_classes = (JSONWebTokenAuthentication,TokenAuthentication,SessionAuthentication,BasicAuthentication)
-    permission_classes = (IsAuthenticated,)
+    # permission_classes = (IsAuthenticated,)
 
     queryset = Author.objects.all()
     serializer_class = AuthorSerializer

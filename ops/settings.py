@@ -66,7 +66,7 @@ MIDDLEWARE = [
 ]
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
-    "PAGE_SIZE": 8,
+    "PAGE_SIZE": 5,
     # 这是rest_formework自带的
     # "DEFAULT_PAGINATION_CLASS":"rest_framework.pagination.PageNumberPagination",
     # 这是我们自己设置的，需要需要在特点app中使用分页，则需要设置pagination_class=None

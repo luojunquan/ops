@@ -75,12 +75,13 @@ class BookSerializer(serializers.ModelSerializer):
         ret["authors"] = authors
         return ret
 
+
+'''
     def to_internal_value(self, data):
+        print(data)
         """将客户端传来的 json 数据 parse 给 Model"""
         # print(data)
         pass
-
-'''
     def create(self, validated_data):
         print(validated_data)  # {'name': '平凡的世界', 'publication_date': datetime.date(2018, 5, 10), 'publisher': <Publish: Publish object>, 'authors': [<Author: Author object>]}
         author_list = validated_data.pop('authors',[])
