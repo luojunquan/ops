@@ -54,6 +54,8 @@ INSTALLED_APPS = [
     'servers.apps.ServersConfig',
     'books.apps.BooksConfig',
 ]
+AUTH_USER_MODEL = "users.User"
+DOMAIN = "@qq.com"
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',

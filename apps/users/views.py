@@ -1,61 +1,162 @@
-
+# -*- coding: utf-8 -*-
+# @Time    : 2020/2/25 20:27
+# @Author  : Luoxiaojian
+# @Email   : ljq906416@gmail.com
+# @File    : views.py
+# @Software: PyCharm
 from django.contrib.auth import get_user_model
-from rest_framework.authentication import SessionAuthentication
-from rest_framework.permissions import IsAuthenticated,AllowAny
-from rest_framework import viewsets, permissions, response
-from rest_framework import mixins
-# Create your views here.
+from django.contrib.auth.models import Permission, Group
+from django.db.models import Q
+from rest_framework import viewsets, mixins, permissions, status
 from rest_framework.response import Response
-
-from users.serializers import UserSerializer
+from rest_framework.pagination import PageNumberPagination
+from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.authentication import TokenAuthentication,BasicAuthentication,SessionAuthentication
+from rest_framework_jwt.authentication import JSONWebTokenAuthentication
+
+from .serializers import UserSerializer, Groupserializer, PermissionSerializer
+from .filters import UserFilter, GroupFilter, PermissionFilter
+from .permissions import IsSuperUser
 
 User = get_user_model()
-class UserViewSet(viewsets.ReadOnlyModelViewSet):
-    '''
-    retrieve:
-        返回指定用户信息
+
+class Pagination(PageNumberPagination):
+    page_size = 5
+    page_size_query_param = 'page_size'
+    page_query_param = "page"
+    max_page_size = 100
+
+
+class UsersViewset(viewsets.ModelViewSet):
+    """
+    create:
+    创建用户
     list:
-        返回用户列表
-    '''
+    获取用户列表
+    retrieve:
+    获取用户信息
+    update:
+    更新用户信息
+    delete:
+    删除用户
+    """
+    authentication_classes = (JSONWebTokenAuthentication, TokenAuthentication, SessionAuthentication, BasicAuthentication)
+    permission_classes = (permissions.DjangoModelPermissions,)
+
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    filter_fields = ('username',)
-    # authentication_classes = (SessionAuthentication,)
-    extra_perm_map = {
-        "GET":['auth.view_user']
-    }
+    pagination_class = Pagination
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter)
+    #filter_class = UserFilter
+    search_fields = ('name', 'username')
+    ordering_fields = ('id',)
 
 class UserInfoViewset(viewsets.ViewSet):
+    """
+    获取当前登陆的用户信息
+    """
+    authentication_classes = (JSONWebTokenAuthentication, TokenAuthentication, SessionAuthentication, BasicAuthentication)
     permission_classes = (permissions.IsAuthenticated,)
+
     def list(self, request, *args, **kwargs):
         data = {
-            "username": "admin",
-            # "name": "rock"
+             "username": self.request.user.username,
+             "name": self.request.user.name
         }
-        return response.Response(data)
-
-class DashboardStatusViewset(viewsets.ViewSet):
-    '''
-    list:
-        获取dashboard状态数据
-    '''
-    permission_classes = (IsAuthenticated,)
-    def list(self, request, *args, **kwargs):
-        data = self.get_content_data()
         return Response(data)
-    def get_content_data(self):
-        return {
-            "aa":11,
-            "bb":22
-        }
-    '''
-    #原始搜索
-    def get_queryset(self):
-        queryset = super(UserViewSet, self).get_queryset()
-        username = self.request.query_params.get('username',None)
-        if username:
-            queryset = queryset.filter(username__icontains=username)
-        return queryset
-    '''
 
+class GroupsViewset(viewsets.ModelViewSet):
+    """
+    create:
+    创建角色
+    list:
+    获取角色列表
+    retrieve:
+    获取角色信息
+    update:
+    更新角色信息
+    delete:
+    删除角色
+    """
+    authentication_classes = (JSONWebTokenAuthentication, TokenAuthentication, SessionAuthentication, BasicAuthentication)
+    permission_classes = (permissions.IsAuthenticated,)
+    queryset = Group.objects.all()
+    serializer_class = Groupserializer
+    pagination_class = Pagination
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter)
+    #filter_class = GroupFilter
+    search_fields = ('name',)
+    ordering_fields = ('id',)
+
+class PermissionsViewset(viewsets.ReadOnlyModelViewSet):
+    """
+    权限列表 视图类
+    list:
+    返回permission列表
+
+    """
+    authentication_classes = (JSONWebTokenAuthentication, TokenAuthentication, SessionAuthentication, BasicAuthentication)
+    permission_classes = (permissions.IsAuthenticated,)
+    queryset = Permission.objects.all()
+    serializer_class = PermissionSerializer
+    pagination_class = Pagination
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter)
+    #filter_class = PermissionFilter
+    search_fields = ("name", 'codename')
+    ordering_fields = ('id',)
+
+class UserGroupsViewset(mixins.UpdateModelMixin, viewsets.GenericViewSet):
+    """
+    update:
+    修改指定用户的角色
+    """
+    authentication_classes = (JSONWebTokenAuthentication, TokenAuthentication, SessionAuthentication, BasicAuthentication)
+    permission_classes = (permissions.IsAuthenticated,)
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+    # 重写update方法，只针对用户和组进行单独的处理，类似的场景还有修改密码，更改状态等
+    def update(self, request, *args, **kwargs):
+        user_obj = self.get_object()
+        roles = request.data.get("role", [])
+        # user_obj.groups = roles    这种写法是错误的
+        user_obj.groups.set(roles)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+class GroupsPermViewset(mixins.UpdateModelMixin, viewsets.GenericViewSet):
+    """
+    update:
+    修改指定角色的权限
+    """
+    authentication_classes = (JSONWebTokenAuthentication, TokenAuthentication, SessionAuthentication, BasicAuthentication)
+    permission_classes = (permissions.IsAuthenticated,)
+
+    queryset = Group.objects.all()
+    serializer_class = Groupserializer
+
+    def update(self, request, *args, **kwargs):
+        group_obj = self.get_object()
+        power = request.data.get("power", [])
+        # group_obj.permissions = power   这种写法是错误的
+        # group_obj.permissions.add(*power)
+        # 或者
+        group_obj.permissions.set(power)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+class GroupMembersViewset(mixins.DestroyModelMixin, viewsets.GenericViewSet):
+    """
+    destroy:
+    从指定组里删除指定成员
+    """
+    authentication_classes = (JSONWebTokenAuthentication, TokenAuthentication, SessionAuthentication, BasicAuthentication)
+    permission_classes = (permissions.IsAuthenticated,)
+
+    queryset = Group.objects.all()
+    serializer_class = Groupserializer
+
+    def destroy(self, request, *args, **kwargs):
+        group_obj = self.get_object()
+        uid = request.data.get('uid', 0)
+        group_obj.user_set.remove(int(uid))
+        return Response(status=status.HTTP_200_OK)
